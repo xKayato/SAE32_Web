@@ -8,7 +8,6 @@ header('Content-Type: application/json');
 $passid = "SalutJeSuisUnMotDePassePourImport";
 
 if (isset($_GET['passid']) && $_GET['passid'] == $passid) {
-    // Vérifier si le paramètre 'table' est présent dans l'URL
     if (isset($_GET['table'])) {
         $table = htmlspecialchars($_GET['table']);
 
@@ -43,7 +42,6 @@ if (isset($_GET['passid']) && $_GET['passid'] == $passid) {
                 }
             }
 
-            // Construire la requête SQL d'insertion dynamiquement
             $champs_str = implode(", ", array_keys($valeurs));
             $placeholders = implode(", ", array_fill(0, count($valeurs), "?"));
             $sql = "INSERT INTO $table ($champs_str) VALUES ($placeholders)";
