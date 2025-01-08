@@ -9,7 +9,7 @@ $passid = "SalutJeSuisUnMotDePassePourUpdate";
 
 if (isset($_GET['passid']) && $_GET['passid'] == $passid) {
     if (isset($_GET['table'])) {
-        $table = $_GET['table'];
+        $table = htmlspecialchars($_GET['table'], ENT_QUOTES);
 
         include('tables.php');
 
@@ -21,6 +21,7 @@ if (isset($_GET['passid']) && $_GET['passid'] == $passid) {
 
             // Identifier les champs "new" pour la mise à jour
             foreach ($_GET as $key => $value) {
+                $key = htmlspecialchars($keys, ENT_QUOTES);
                 if (strpos($key, 'new') === 0) { // Si ça commence par "new"
                     $field = substr($key, 3); // Retirer "new" pour obtenir le nom du champ
                     $updates[] = "$field = :new$field";  // Utiliser :new$field pour ne pas interférer avec la condition
@@ -30,6 +31,7 @@ if (isset($_GET['passid']) && $_GET['passid'] == $passid) {
 
             // Identifier les conditions
             foreach ($_GET as $key => $value) {
+                $key = htmlspecialchars($keys, ENT_QUOTES);
                 if ($key !== 'passid' && $key !== 'table' && strpos($key, 'new') !== 0) {
                     $conditions[] = "$key = :$key";
                     $params[":$key"] = $value;

@@ -10,9 +10,20 @@ $passid = "SalutJeSuisUnMotDePassePourImport";
 if (isset($_GET['passid']) && $_GET['passid'] == $passid) {
     // Vérifier si le paramètre 'table' est présent dans l'URL
     if (isset($_GET['table'])) {
-        $table = $_GET['table'];
+        $table = htmlspecialchars($_GET['table']);
 
-       include('tables.php');
+
+        // Liste des tables autorisées
+        $tables_autorisees = ['Oeuvre', 'User', 'Like', 'Avis', 'Type'];
+
+        // Champs autorisés par table
+        $champs_par_table = [
+            'Oeuvre' => ['nomOeuvre', 'dateSortie', 'actif', 'auteur_studio', 'type'],
+            'User' => ['login', 'mdp', 'acces'],
+            'Like' => ['login', 'idAvis', 'like'],
+            'Avis' => ['texteAvis', 'note', 'date', 'idOeuvre', 'login'],
+            'Type' => ['nomType']
+        ];
 
 
         // Vérifier si la table demandée est autorisée
@@ -25,7 +36,7 @@ if (isset($_GET['passid']) && $_GET['passid'] == $passid) {
             // Vérifier que tous les champs sont présents dans les paramètres GET
             foreach ($champs as $champ) {
                 if (isset($_GET[$champ])) {
-                    $valeurs[$champ] = $_GET[$champ];
+                    $valeurs[$champ] = htmlspecialchars($_GET[$champ]);
                 } else {
                     echo json_encode(["error" => "Le champ '$champ' est manquant pour la table '$table'"]);
                     exit;
@@ -54,7 +65,7 @@ if (isset($_GET['passid']) && $_GET['passid'] == $passid) {
     } else {
         echo json_encode(["error" => "Paramètre 'table' manquant"]);
     }
-} else{
+} else {
     echo json_encode(["error" => "Mot de passe incorrect"]);
 }
 ?>

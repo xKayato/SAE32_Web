@@ -11,7 +11,7 @@ $passid = "SalutJeSuisUnMotDePassePourGet";
 if (isset($_GET['passid']) && $_GET['passid'] == $passid) {
     // Vérifier si le paramètre 'table' est présent
     if (isset($_GET['table'])) {
-        $table = $_GET['table'];
+        $table = htmlspecialchars($_GET['table']);
 
         include('tables.php');
 
@@ -20,7 +20,9 @@ if (isset($_GET['passid']) && $_GET['passid'] == $passid) {
             $champs_disponibles = $champs_par_table[$table];
 
             // Champs à afficher
-            $champs_a_afficher = isset($_GET['fields']) ? explode(',', $_GET['fields']) : $champs_disponibles;
+            $champs_a_afficher = isset($_GET['fields']) 
+                ? array_map('htmlspecialchars', explode(',', $_GET['fields'])) 
+                : $champs_disponibles;
 
             // Ajouter des champs supplémentaires pour les jointures
             if ($table == 'Avis' && !in_array('nomOeuvre', $champs_a_afficher)) {
@@ -55,7 +57,7 @@ if (isset($_GET['passid']) && $_GET['passid'] == $passid) {
             foreach ($champs_disponibles as $champ) {
                 if (isset($_GET[$champ])) {
                     $conditions[] = "$table.$champ = :$champ";
-                    $params[":$champ"] = $_GET[$champ];
+                    $params[":$champ"] = htmlspecialchars($_GET[$champ]);
                 }
             }
 
