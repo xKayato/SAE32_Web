@@ -11,7 +11,7 @@ $passid = "SalutJeSuisUnMotDePassePourGet";
 if (isset($_GET['passid']) && $_GET['passid'] == $passid) {
     // Vérifier si le paramètre 'table' est présent
     if (isset($_GET['table'])) {
-        $table = htmlspecialchars($_GET['table']);
+        $table = htmlspecialchars($_GET['table']); // Sécuriser les paramètres de table
 
         include('tables.php');
 
@@ -25,8 +25,13 @@ if (isset($_GET['passid']) && $_GET['passid'] == $passid) {
                 : $champs_disponibles;
 
             // Ajouter des champs supplémentaires pour les jointures
-            if ($table == 'Avis' && !in_array('nomOeuvre', $champs_a_afficher)) {
-                $champs_a_afficher[] = 'nomOeuvre'; // Inclure le champ de la table Oeuvre
+            if ($table == 'Avis') {
+                if (!in_array('nomOeuvre', $champs_a_afficher)) {
+                    $champs_a_afficher[] = 'nomOeuvre'; // Inclure le champ de la table Oeuvre
+                }
+                if (!in_array('type', $champs_a_afficher)) {
+                    $champs_a_afficher[] = 'type'; // Inclure le champ type de la table Oeuvre
+                }
             }
 
             if (empty($champs_a_afficher)) {
@@ -36,8 +41,8 @@ if (isset($_GET['passid']) && $_GET['passid'] == $passid) {
 
             // Construire la liste des champs avec leurs préfixes
             $champs_str = implode(", ", array_map(function ($champ) use ($table, $champs_par_table) {
-                if ($table == 'Avis' && $champ == 'nomOeuvre') {
-                    return "Oeuvre.nomOeuvre"; // Champ venant de la jointure
+                if ($table == 'Avis' && ($champ == 'nomOeuvre' || $champ == 'type')) {
+                    return "Oeuvre.$champ"; // Champs venant de la jointure
                 }
                 return $table . "." . $champ; // Champs standards
             }, $champs_a_afficher));
@@ -56,8 +61,10 @@ if (isset($_GET['passid']) && $_GET['passid'] == $passid) {
             // Ajouter les filtres dynamiques pour les colonnes disponibles
             foreach ($champs_disponibles as $champ) {
                 if (isset($_GET[$champ])) {
+                    // Déséchapper les caractères spéciaux si nécessaire
+                    $value = stripslashes($_GET[$champ]); // Déséchapper les caractères comme \/
                     $conditions[] = "$table.$champ = :$champ";
-                    $params[":$champ"] = htmlspecialchars($_GET[$champ]);
+                    $params[":$champ"] = htmlspecialchars($value); // Appliquer htmlspecialchars uniquement après déséchappement
                 }
             }
 
