@@ -5,15 +5,17 @@ include('connect.php');
 // Définir le type de contenu comme JSON
 header('Content-Type: application/json');
 
-$passid = "SalutJeSuisUnMotDePassePourUpdate";
+// Clé de sécurité pour vérifier l'authenticité de la requête
+$passid = "sdj-fK_OJF74AZsdQs6--_9js_S41-D";
 
+// Vérifier la clé de sécurité
 if (isset($_GET['passid']) && $_GET['passid'] == $passid) {
     if (isset($_GET['table'])) {
         $table = $_GET['table'];
 
         include('tables.php');
 
-        // Vérifier si la table est autorisée
+        // V\u00e9rifier si la table est autorisée
         if (in_array($table, $tables_autorisees)) {
             $conditions = [];
             $updates = [];
@@ -42,21 +44,21 @@ if (isset($_GET['passid']) && $_GET['passid'] == $passid) {
                 exit;
             }
 
-            // Construire la requête SQL
+            // Construire la requete SQL
             $sql = "UPDATE $table SET " . implode(", ", $updates);
             if (!empty($conditions)) {
                 $sql .= " WHERE " . implode(" AND ", $conditions);
             }
 
-            // Exécuter la requête
+            // Exécuter la requete
             try {
                 $stmt = $conn->prepare($sql);
                 $stmt->execute($params);
 
                 if ($stmt->rowCount() > 0) {
-                    echo json_encode(["success" => "Données mises à jour avec succès"]);
+                    echo json_encode(["success" => "Données mises à jour avec succès dans la table '$table'"]);
                 } else {
-                    echo json_encode(["message" => "Aucune ligne affectée"]);
+                    echo json_encode(["message" => "Aucune ligne affectée. Vérifiez vos conditions"]);
                 }
             } catch (PDOException $e) {
                 echo json_encode(["error" => "Erreur : " . $e->getMessage()]);
@@ -65,7 +67,7 @@ if (isset($_GET['passid']) && $_GET['passid'] == $passid) {
             echo json_encode(["error" => "Table non autorisée"]);
         }
     } else {
-        echo json_encode(["error" => "Paramètre 'table' manquant"]);
+        echo json_encode(["error" => "Paramêtre 'table' manquant"]);
     }
 } else {
     echo json_encode(["error" => "Mot de passe incorrect"]);

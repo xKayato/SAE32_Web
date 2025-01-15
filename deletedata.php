@@ -5,7 +5,7 @@ include('connect.php');
 // Définir le type de contenu comme JSON
 header('Content-Type: application/json');
 
-$passid = "SalutJeSuisUnMotDePassePourDelete";
+$passid = "sdfjJSDF_-ML3K42_--_12_-Skfl9";
 
 if (isset($_GET['passid']) && $_GET['passid'] == $passid) {
     if (isset($_GET['table'])) {

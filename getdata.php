@@ -2,12 +2,13 @@
 // Connexion à la base de données
 include('connect.php');
 
+// Définir le type de contenu comme JSON
 header('Content-Type: application/json');
 
-// Clé de sécurité
-$passid = "SalutJeSuisUnMotDePassePourGet";
+// Clé de sécurité pour vérifier l'authenticité de la requête
+$passid = "Aij84k_-2RRS6d51dq6FSd698-(_45";
 
-// Vérification du mot de passe
+// Vérifier la clé de sécurité
 if (isset($_GET['passid']) && $_GET['passid'] == $passid) {
     // Vérifier si le paramètre 'table' est présent
     if (isset($_GET['table'])) {
@@ -63,6 +64,7 @@ if (isset($_GET['passid']) && $_GET['passid'] == $passid) {
                 if (isset($_GET[$champ])) {
                     // Déséchapper les caractères spéciaux si nécessaire
                     $value = stripslashes($_GET[$champ]); // Déséchapper les caractères comme \/
+                    // Encodage des valeurs avant de les insérer dans la requête SQL
                     $conditions[] = "$table.$champ = :$champ";
                     $params[":$champ"] = htmlspecialchars($value); // Appliquer htmlspecialchars uniquement après déséchappement
                 }
@@ -82,6 +84,21 @@ if (isset($_GET['passid']) && $_GET['passid'] == $passid) {
 
                 // Retourner les résultats en JSON
                 if ($data) {
+                    // Si des données sont trouvées, vérifier s'il s'agit de l'image demandée
+                    if (isset($_GET['title'])) {
+                        $title = urldecode($_GET['title']);
+                        $imagePath = '/path/to/images/' . $title . '.jpg'; // Chemin vers l'image sur le serveur
+
+                        if (file_exists($imagePath)) {
+                            header('Content-Type: image/jpeg');
+                            readfile($imagePath); // Retourner l'image
+                            exit; // Terminer le script après avoir envoyé l'image
+                        } else {
+                            echo json_encode(["error" => "Image non trouvée"]);
+                            exit;
+                        }
+                    }
+
                     echo json_encode($data);
                 } else {
                     echo json_encode(["message" => "Aucune donnée trouvée"]);

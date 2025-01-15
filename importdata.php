@@ -5,12 +5,14 @@ include('connect.php');
 // Définir le type de contenu comme JSON
 header('Content-Type: application/json');
 
-$passid = "SalutJeSuisUnMotDePassePourImport";
+// Clé de sécurité pour vérifier l'authenticité de la requête
+$passid = "94JD-kd_us8-UwU-13-jws-_(";
 
+// Vérifier la clé de sécurité
 if (isset($_GET['passid']) && $_GET['passid'] == $passid) {
     // Vérifier si le paramètre 'table' est présent dans l'URL
     if (isset($_GET['table'])) {
-        $table = htmlspecialchars($_GET['table']); // Sécuriser le nom de la table
+        $table = $_GET['table']; // Le nom de la table est pris tel quel
 
         // Liste des tables autorisées
         $tables_autorisees = ['Oeuvre', 'User', 'Like', 'Avis', 'Type'];
@@ -34,13 +36,9 @@ if (isset($_GET['passid']) && $_GET['passid'] == $passid) {
             // Vérifier que tous les champs sont présents dans les paramètres GET
             foreach ($champs as $champ) {
                 if (isset($_GET[$champ])) {
-                    // Assurer que les données sont valides
+                    // Ne pas appliquer htmlspecialchars ici, car PDO le gère dans la requête préparée
                     $valeur = $_GET[$champ];
-                    if ($champ == 'dateSortie' && !preg_match("/^\d{4}-\d{2}-\d{2}$/", $valeur)) {
-                        echo json_encode(["error" => "Le champ '$champ' doit être une date valide (format: YYYY-MM-DD)"]);
-                        exit;
-                    }
-                    $valeurs[$champ] = htmlspecialchars($valeur, ENT_QUOTES, 'UTF-8'); // Appliquer htmlspecialchars pour éviter les XSS
+                    $valeurs[$champ] = $valeur; // Ajout des valeurs sans modification
                 } else {
                     echo json_encode(["error" => "Le champ '$champ' est manquant pour la table '$table'"]);
                     exit;
@@ -55,7 +53,7 @@ if (isset($_GET['passid']) && $_GET['passid'] == $passid) {
             // Préparer et exécuter la requête d'insertion
             try {
                 $stmt = $conn->prepare($sql);
-                $stmt->execute(array_values($valeurs));
+                $stmt->execute(array_values($valeurs)); // Utilisation de PDO pour sécuriser l'insertion (pas besoin de htmlspecialchars)
 
                 // Confirmer l'insertion
                 echo json_encode(["success" => "Données insérées avec succès dans la table '$table'"]);
